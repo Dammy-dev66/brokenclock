@@ -1,0 +1,17 @@
+{
+  "name": "proofreading-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "mammoth": "^1.9.1",
+    "pdf-parse": "^1.1.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
