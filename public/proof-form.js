@@ -7,7 +7,6 @@
 
   const $ = (selector) => form.querySelector(selector);
   const $$ = (selector) => Array.from(form.querySelectorAll(selector));
-
   const text = $("#fbProofText");
   const wordCount = $("#fbWordCount");
   const cost = $("#fbCost");
@@ -54,30 +53,6 @@
     }
     uploadTitle.textContent = title;
     uploadMessage.textContent = message;
-  }
-
-  function resetFormUi() {
-    form.reset();
-    wordCount.textContent = "0";
-    cost.textContent = "€0.00";
-    wordCountInput.value = "0";
-    costInput.value = "€0.00";
-    serviceLevelInput.value = "Premium";
-    englishPreferenceInput.value = "UK English";
-    rate = 0.05;
-    uploadLabel.textContent = "Drag & drop, or click to upload";
-    uploadState("", "Ready for a document", "Upload a DOCX, text-based PDF, or TXT file to calculate the word count.");
-
-    $$(".fb-service-grid button").forEach((button) => {
-      button.classList.toggle("active", button.dataset.service === "Premium");
-    });
-
-    $$(".fb-toggle button").forEach((button) => {
-      button.classList.toggle("active", button.dataset.preference === "UK English");
-    });
-
-    updateEstimate();
-    updateSubmitState();
   }
 
   $$(".fb-service-grid button").forEach((button) => {
@@ -139,7 +114,7 @@
     event.preventDefault();
     updateEstimate();
     submit.disabled = true;
-    submit.textContent = "Submitting...";
+    submit.textContent = "Creating payment...";
 
     try {
       const formData = new FormData(form);
@@ -152,14 +127,23 @@
       formData.set("request_status", "New");
 
       const response = await fetch(WEBHOOK_URL, { method: "POST", body: formData });
-      if (!response.ok) throw new Error("Webhook submission failed.");
+      let result = {};
 
-      alert("Your proofreading request has been submitted successfully.");
-      resetFormUi();
+      try {
+        result = await response.json();
+      } catch (jsonError) {
+        throw new Error("Make did not return JSON.");
+      }
+
+      if (!response.ok || !result.success || !result.checkout_url) {
+        throw new Error(result.error || "Payment link was not created.");
+      }
+
+      submit.textContent = "Redirecting to payment...";
+      window.location.href = result.checkout_url;
     } catch (error) {
       console.error(error);
-      alert("Something went wrong while submitting your request. Please try again.");
-    } finally {
+      alert("Something went wrong while creating the payment page. Please try again.");
       submit.textContent = "Submit for review ↗";
       updateSubmitState();
     }
