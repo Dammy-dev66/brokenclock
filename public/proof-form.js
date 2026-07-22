@@ -25,13 +25,16 @@
   const uploadMessage = $("#fbUploadMessage");
 
   let rate = 0.05;
+  let uploadedDocumentText = "";
+  let useUploadedDocumentText = false;
 
   function countWords(value) {
     return value.trim().split(/\s+/).filter(Boolean).length;
   }
 
   function updateEstimate() {
-    const words = text.value.trim() ? countWords(text.value) : 0;
+    const estimateSource = useUploadedDocumentText ? uploadedDocumentText : text.value;
+    const words = estimateSource.trim() ? countWords(estimateSource) : 0;
     const total = "€" + (words * rate).toFixed(2);
     wordCount.textContent = words;
     cost.textContent = total;
@@ -73,7 +76,11 @@
     });
   });
 
-  text.addEventListener("input", updateEstimate);
+  text.addEventListener("input", () => {
+    useUploadedDocumentText = false;
+    uploadedDocumentText = "";
+    updateEstimate();
+  });
   text.addEventListener("keyup", updateEstimate);
   text.addEventListener("paste", () => setTimeout(updateEstimate, 0));
   consent.addEventListener("change", updateSubmitState);
@@ -83,6 +90,8 @@
     const file = fileInput.files[0];
 
     if (!file) {
+      uploadedDocumentText = "";
+      useUploadedDocumentText = false;
       uploadLabel.textContent = "Drag & drop, or click to upload";
       uploadState("", "Ready for a document", "Upload a DOCX, text-based PDF, or TXT file to calculate the word count.");
       return;
@@ -99,6 +108,8 @@
       const result = await response.json();
       if (!response.ok || !result.success) throw new Error(result.error || "Could not read document.");
 
+      uploadedDocumentText = result.text;
+      useUploadedDocumentText = true;
       text.value = result.text;
       updateEstimate();
       uploadState("success", "Document ready", file.name + " was read successfully. Estimated word count: " + wordCountInput.value + ". Estimated cost: " + costInput.value + ".");
@@ -118,7 +129,7 @@
 
     try {
       const formData = new FormData(form);
-      formData.set("pasted_text", text.value);
+      formData.set("pasted_text", useUploadedDocumentText ? uploadedDocumentText : text.value);
       formData.set("word_count", wordCountInput.value);
       formData.set("calculated_price", costInput.value);
       formData.set("service_level", serviceLevelInput.value);
