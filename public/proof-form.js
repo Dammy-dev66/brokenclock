@@ -77,6 +77,12 @@
   });
 
   text.addEventListener("input", () => {
+    if (useUploadedDocumentText && document.activeElement !== text) {
+      text.value = uploadedDocumentText;
+      updateEstimate();
+      return;
+    }
+
     useUploadedDocumentText = false;
     uploadedDocumentText = "";
     updateEstimate();
