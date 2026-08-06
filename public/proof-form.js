@@ -7,22 +7,20 @@
     const $ = (selector) => document.querySelector(selector);
 
     const nodes = {
-      editorStatus: $("[data-editor-status-mini]"),
-      editorStatusText: $("[data-editor-status-text-mini]"),
-      editorTime: $("[data-editor-time-mini]"),
-      editorSeconds: $("[data-editor-seconds-mini]"),
-      editorZone: $("[data-editor-zone-mini]"),
-      editorDate: $("[data-editor-date-mini]"),
-      localCity: $("[data-local-city-mini]"),
-      localTime: $("[data-local-time-mini]"),
-      localSeconds: $("[data-local-seconds-mini]"),
-      localZone: $("[data-local-zone-mini]"),
-      localDate: $("[data-local-date-mini]"),
-      timeDifference: $("[data-time-difference-mini]"),
-      replyNote: $("[data-reply-note-mini]")
+      editorStatus: $("[data-editor-status]"),
+      editorStatusText: $("[data-editor-status-text]"),
+      editorTime: $("[data-editor-time]"),
+      editorSeconds: $("[data-editor-seconds]"),
+      editorZone: $("[data-editor-zone]"),
+      editorDate: $("[data-editor-date]"),
+      localCity: $("[data-local-city]"),
+      localTime: $("[data-local-time]"),
+      localSeconds: $("[data-local-seconds]"),
+      localZone: $("[data-local-zone]"),
+      localDate: $("[data-local-date]"),
+      timeDifference: $("[data-time-difference]"),
+      replyNote: $("[data-reply-note]")
     };
-
-    if (!nodes.editorStatus) return;
 
     function partsFor(date, timeZone) {
       const parts = new Intl.DateTimeFormat("en-GB", {
